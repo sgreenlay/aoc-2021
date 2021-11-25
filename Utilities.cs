@@ -33,6 +33,14 @@ namespace Utilities
     
     public static class Extensions
     {
+        public static IEnumerable<string> SplitOnNewLine(this string source)
+        {
+            return source.Split(
+                new string[] { "\r\n", "\r", "\n" },
+                System.StringSplitOptions.RemoveEmptyEntries
+            );
+        }
+        
         // Enumerate all possible combinations from a list of values
         // https://stackoverflow.com/a/57058345
         public static IEnumerable<T[]> Combinations<T>(this IEnumerable<T> source)

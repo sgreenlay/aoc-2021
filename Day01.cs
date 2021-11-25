@@ -19,10 +19,7 @@ class Day01 : IDay
 
     public void run()
     {
-        var input = File.ReadAllText(@"input/day01.txt").Split(
-            new string[] { "\r\n", "\r", "\n" },
-            System.StringSplitOptions.RemoveEmptyEntries
-        ).Select(s => int.Parse(s));
+        var input = File.ReadAllText(@"input/day01.txt").SplitOnNewLine().Select(s => int.Parse(s));
 
         var testInput = new int[]{ 1721, 979, 366, 299, 675, 1456 };
         Debug.Assert(part1(testInput) == 514579);
