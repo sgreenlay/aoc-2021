@@ -1,0 +1,3 @@
+interface IDay {
+    void run();
+}
