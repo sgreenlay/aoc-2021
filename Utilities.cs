@@ -33,12 +33,28 @@ namespace Utilities
     
     public static class Extensions
     {
-        public static IEnumerable<string> SplitOnNewLine(this string source)
+        public static IEnumerable<string> SplitOnNewLine(this string source, bool ignoreEmptyLines = true)
         {
-            return source.Split(
-                new string[] { "\r\n", "\r", "\n" },
-                System.StringSplitOptions.RemoveEmptyEntries
-            );
+            var options = 
+                (ignoreEmptyLines ? System.StringSplitOptions.RemoveEmptyEntries : System.StringSplitOptions.None) |
+                System.StringSplitOptions.TrimEntries;
+            return source.Split(new string[] { "\r\n", "\r", "\n" }, options);
+        }
+
+        public static bool InRange(this char source, char start, char end)
+        {
+            if (end < start)
+                throw new ArgumentException("End must come after start");
+            
+            return (source >= start) && (source <= end);
+        }
+
+        public static bool InRange(this int source, int start, int end)
+        {
+            if (end < start)
+                throw new ArgumentException("End must come after start");
+            
+            return (source >= start) && (source <= end);
         }
         
         // Enumerate all possible combinations from a list of values
