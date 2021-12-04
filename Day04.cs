@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Utilities;
 
 class Day04 : IDay
@@ -13,9 +12,8 @@ class Day04 : IDay
         public static BingoBoard Parse(IEnumerator<string> iter)
         {
             List<int[]> rows = new List<int[]>();
-            var rx = new Regex(@"\s+", RegexOptions.Compiled);
             do {
-                rows.Add(rx.Split(iter.Current).Select(int.Parse).ToArray());
+                rows.Add(iter.Current.SplitOnWhitespace().Select(int.Parse).ToArray());
             } while (iter.MoveNext() && iter.Current != "");
             return new BingoBoard {
                 Grid = rows.ToArray(),
@@ -118,19 +116,17 @@ class Day04 : IDay
 
     int part1(Bingo bingo)
     {
-        List<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone()).ToList();
-
+        IEnumerable<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone());
         foreach (var n in bingo.Numbers)
         {
-            for (var i = 0; i < boards.Count; ++i)
+            foreach (var board in boards)
             {
-                boards[i].Mark(n);
-            }
-            
-            var winners = bingo.Boards.Where(board => board.IsWinner());
-            if (winners.Count() != 0)
-            {
-                return n * winners.First().Score();
+                board.Mark(n);
+
+                if (board.IsWinner())
+                {
+                    return n * board.Score();
+                }
             }
         }
         throw new ArgumentException("No winners");
@@ -138,20 +134,27 @@ class Day04 : IDay
 
     int part2(Bingo bingo)
     {
-        List<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone()).ToList();
+        IEnumerable<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone());
 
-        List<int> winningScores = new List<int>();
+        int lastWinningScore = -1;
         foreach (var n in bingo.Numbers)
         {
-            for (var i = 0; i < boards.Count; ++i)
+            foreach (var board in boards)
             {
-                boards[i].Mark(n);
-            }
+                board.Mark(n);
 
-            winningScores = winningScores.Concat(boards.Where(board => board.IsWinner()).Select(board => n * board.Score())).ToList();
-            boards = boards.Where(board => !board.IsWinner()).ToList();
+                if (board.IsWinner())
+                {
+                    lastWinningScore = board.Score() * n;
+                }
+            }
+            boards = boards.Where(board => !board.IsWinner());
+            if (boards.Count() == 0)
+            {
+                break;
+            }
         }
-        return winningScores.Last();
+        return lastWinningScore;
     }
 
     public void run()

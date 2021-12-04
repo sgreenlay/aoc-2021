@@ -41,6 +41,14 @@ namespace Utilities
             return source.Split(new string[] { "\r\n", "\r", "\n" }, options);
         }
 
+        public static IEnumerable<string> SplitOnWhitespace(this string source, bool ignoreEmptyLines = true)
+        {
+            var options = 
+                (ignoreEmptyLines ? System.StringSplitOptions.RemoveEmptyEntries : System.StringSplitOptions.None) |
+                System.StringSplitOptions.TrimEntries;
+            return source.Split(new string[] { " ", "\t" }, options);
+        }
+
         public static bool InRange(this char source, char start, char end)
         {
             if (end < start)
