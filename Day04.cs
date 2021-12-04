@@ -59,20 +59,6 @@ class Day04 : IDay
                 }
             }
 
-            /*
-            var diagLR = Grid.Select((row, i) => row[i]).ToArray();
-            if (diagLR.Count(i => i == -1) == Grid.Length)
-            {
-                return true;
-            }
-
-            var diagRL = Grid.Select((row, i) => row[dimension - 1 - i]).ToArray();
-            if (diagRL.Count(i => i == -1) == dimension)
-            {
-                return true;
-            }
-            */
-
             return false;
         }
 
@@ -100,19 +86,6 @@ class Day04 : IDay
             return new BingoBoard {
                 Grid = (int[][])Grid.Clone(),
             };
-        }
-
-        public void Print()
-        {
-            var dimension = Grid.Length;
-            for (var r = 0; r < dimension; ++r)
-            {
-                for (var c = 0; c < dimension; ++c)
-                {
-                    Console.Write(String.Format("{0,3}", Grid[r][c]));
-                }
-                Console.WriteLine("");
-            }
         }
     }
     
@@ -145,23 +118,19 @@ class Day04 : IDay
 
     int part1(Bingo bingo)
     {
-        IEnumerable<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone());
+        List<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone()).ToList();
 
         foreach (var n in bingo.Numbers)
         {
-            //Console.WriteLine($"Drawing {n}");
-            foreach (var board in boards)
+            for (var i = 0; i < boards.Count; ++i)
             {
-                board.Mark(n);
-
-                //board.Print();
-                //Console.WriteLine("");
+                boards[i].Mark(n);
             }
+            
             var winners = bingo.Boards.Where(board => board.IsWinner());
             if (winners.Count() != 0)
             {
-                var winner = winners.First();
-                return n * winner.Score();
+                return n * winners.First().Score();
             }
         }
         throw new ArgumentException("No winners");
@@ -169,7 +138,20 @@ class Day04 : IDay
 
     int part2(Bingo bingo)
     {
-        return 0;
+        List<BingoBoard> boards = bingo.Boards.Select(b => (BingoBoard)b.Clone()).ToList();
+
+        List<int> winningScores = new List<int>();
+        foreach (var n in bingo.Numbers)
+        {
+            for (var i = 0; i < boards.Count; ++i)
+            {
+                boards[i].Mark(n);
+            }
+
+            winningScores = winningScores.Concat(boards.Where(board => board.IsWinner()).Select(board => n * board.Score())).ToList();
+            boards = boards.Where(board => !board.IsWinner()).ToList();
+        }
+        return winningScores.Last();
     }
 
     public void run()
@@ -197,7 +179,7 @@ class Day04 : IDay
 ".SplitOnNewLine(false));
 
         Debug.Assert(part1(testInput) == 4512);
-        Debug.Assert(part2(testInput) == 0);
+        Debug.Assert(part2(testInput) == 1924);
 
         var input = Bingo.Parse(File.ReadAllText(@"input/day04.txt").SplitOnNewLine(false));
 
