@@ -8,23 +8,26 @@ class Day06 : IDay
 {
     Int64 runSimulation(IEnumerable<int> inputs, int days)
     {
-        var state = inputs.ToArray();
+        var state = inputs.Select(i => (i, (Int64)1)).ToArray();
         for (var d = 0; d < days; ++d)
         {
-            var newStates = new List<int>();
+            Int64 statesToAdd = 0;
             for (var i = 0; i < state.Length; ++i)
             {
-                if (state[i] == 0)
+                if (state[i].Item1 == 0)
                 {
-                    state[i] = 7;
-                    newStates.Add(8);
+                    state[i].Item1 = 7;
+                    statesToAdd += state[i].Item2;
                 }
-                state[i] -= 1;
+                state[i].Item1 -= 1;
             }
-            state = state.Concat(newStates).ToArray();
-            Console.WriteLine($"{newStates.Count} added");
+            if (statesToAdd > 0)
+            {
+                state = state.Append((8, statesToAdd)).ToArray();
+            }
         }
-        return state.Length;
+        var count =  state.Select(state => (Int64)state.Item2).Sum();
+        return count;
     }
 
     Int64 part1(IEnumerable<int> inputs)
