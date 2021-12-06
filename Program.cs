@@ -13,7 +13,10 @@ Console.WriteLine("Day 03");
 
 Console.WriteLine("Day 04");
 (new Day04()).run();
-*/
 
 Console.WriteLine("Day 05");
 (new Day05()).run();
+*/
+
+Console.WriteLine("Day 06");
+(new Day06()).run();
