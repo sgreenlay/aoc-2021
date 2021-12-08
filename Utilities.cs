@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Utilities
 {
     public static class Numbers
@@ -63,6 +65,48 @@ namespace Utilities
                 throw new ArgumentException("End must come after start");
             
             return (source >= start) && (source <= end);
+        }
+
+        public static Dictionary<char, int> CharCounts(this string str)
+        {
+            Dictionary<char, int> counts = new Dictionary<char, int>();
+            foreach (var ch in str)
+            {
+                if (counts.ContainsKey(ch))
+                {
+                    counts[ch] += 1;
+                }
+                else
+                {
+                    counts[ch] = 0;
+                }
+            }
+            return counts;
+        }
+
+        public static bool AnagramOf(this string a, string b)
+        {
+            if (a.Length != b.Length) {
+                return false;
+            }
+
+            var countsA = a.CharCounts();
+            var countsB = b.CharCounts();
+
+            return countsA.Count == countsB.Count && !countsA.Except(countsB).Any();
+        }
+
+        public static int ToInt(this IEnumerable<int> source)
+        {
+            if (null == source)
+                throw new ArgumentNullException(nameof(source));
+
+            var length = source.Count();
+            return source.Select((s, i) => {
+                if (s < 0 || s > 9)
+                    throw new ArgumentException("Digits must be 0 to 9");
+                return s * (int)Math.Pow(10, length - i - 1);
+            }).Sum();
         }
         
         // Enumerate all possible combinations from a list of values
