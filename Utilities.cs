@@ -51,6 +51,19 @@ namespace Utilities
             return source.Split(new string[] { " ", "\t" }, options);
         }
 
+        public static int Product(this IEnumerable<int> source)
+        {
+            return source.Aggregate(1, (product, i) => product * i);
+        }
+
+        public static int ToInt(this char source)
+        {
+            if (!source.InRange('0', '9'))
+                throw new ArgumentException("Must be 0 to 9");
+
+            return source - '0';
+        }
+
         public static bool InRange(this char source, char start, char end)
         {
             if (end < start)
