@@ -8,7 +8,7 @@ class Day14 : IDay
     class Input
     {
         public string Polymer;
-        public Dictionary<char, Dictionary<char, char>> Instructions;
+        public Dictionary<string, (char, string, string)> Instructions;
 
         public static Input Parse(IEnumerable<string> input)
         {
@@ -20,21 +20,16 @@ class Day14 : IDay
 
             while (iter.MoveNext() && iter.Current == "") {}
 
-            Dictionary<char, Dictionary<char, char>> instructions = new Dictionary<char, Dictionary<char, char>>();
+            Dictionary<string, (char, string, string)> instructions = new Dictionary<string, (char, string, string)>();
             do {
                 var instruction = iter.Current.Split(" -> ");
-                var start = instruction.First().First();
-                var end = instruction.First().Last();
+                var pair = instruction.First();
                 var insert = instruction.Last().First();
 
-                if (instructions.ContainsKey(start))
-                {
-                    instructions[start].Add(end, insert);
-                }
-                else
-                {
-                    instructions.Add(start, new Dictionary<char, char>() { { end, insert } });
-                }
+                var first = $"{pair.First()}{insert}";
+                var second = $"{insert}{pair.Last()}";
+
+                instructions.Add(pair, (insert, first, second));
             } while (iter.MoveNext() && iter.Current != "");
 
             return new Input {
@@ -44,37 +39,53 @@ class Day14 : IDay
         }
     }
 
-    Int64 runSteps(Input input, int steps)
+    Int64 RunSteps(Input input, int steps)
     {
-        string polymer = input.Polymer;
+        var counts = input.Polymer.CharCounts();
+        var pairs = input.Polymer.Window(2).Select(w => new string(w)).Counts();
 
         for (var step = 0; step < steps; ++step)
         {
-            List<char> nextPolymer = new List<char>();
+            Dictionary<string, Int64> nextPairs = new Dictionary<string, Int64>();
 
-            var start = polymer.GetEnumerator();
-            var end = polymer.GetEnumerator();
-
-            end.MoveNext();
-
-            while (start.MoveNext() && end.MoveNext())
+            foreach (var pair in pairs)
             {
-                nextPolymer.Add(start.Current);
-                if (input.Instructions.ContainsKey(start.Current))
+                if (input.Instructions.ContainsKey(pair.Key))
                 {
-                    var ends = input.Instructions[start.Current];
-                    if (ends.ContainsKey(end.Current))
+                    var replacement = input.Instructions[pair.Key];
+
+                    if (counts.ContainsKey(replacement.Item1))
                     {
-                        nextPolymer.Add(ends[end.Current]);
+                        counts[replacement.Item1] += pair.Value;
+                    }
+                    else
+                    {
+                        counts[replacement.Item1] = pair.Value;
+                    }
+                    
+                    if (nextPairs.ContainsKey(replacement.Item2))
+                    {
+                        nextPairs[replacement.Item2] += pair.Value;
+                    }
+                    else
+                    {
+                        nextPairs[replacement.Item2] = pair.Value;
+                    }
+
+                    if (nextPairs.ContainsKey(replacement.Item3))
+                    {
+                        nextPairs[replacement.Item3] += pair.Value;
+                    }
+                    else
+                    {
+                        nextPairs[replacement.Item3] = pair.Value;
                     }
                 }
             }
-            nextPolymer.Add(start.Current);
 
-            polymer = new string(nextPolymer.ToArray());
+            pairs = nextPairs;
         }
         
-        var counts = polymer.CharCounts();
         var mostCommon = counts.MaxBy(kv => kv.Value);
         var leastCommon = counts.MinBy(kv => kv.Value);
 
@@ -83,12 +94,12 @@ class Day14 : IDay
     
     Int64 part1(Input input)
     {
-        return runSteps(input, 10);
+        return RunSteps(input, 10);
     }
 
     Int64 part2(Input input)
     {
-        return runSteps(input, 40);
+        return RunSteps(input, 40);
     }
 
     public void run()

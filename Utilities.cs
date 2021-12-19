@@ -82,19 +82,7 @@ namespace Utilities
 
         public static Dictionary<char, Int64> CharCounts(this string str)
         {
-            Dictionary<char, Int64> counts = new Dictionary<char, Int64>();
-            foreach (var ch in str)
-            {
-                if (counts.ContainsKey(ch))
-                {
-                    counts[ch] += 1;
-                }
-                else
-                {
-                    counts[ch] = 0;
-                }
-            }
-            return counts;
+            return str.AsEnumerable().Counts();
         }
 
         public static bool AnagramOf(this string a, string b)
@@ -120,6 +108,23 @@ namespace Utilities
                     throw new ArgumentException("Digits must be 0 to 9");
                 return s * (int)Math.Pow(10, length - i - 1);
             }).Sum();
+        }
+
+        public static Dictionary<T, Int64> Counts<T>(this IEnumerable<T> source) where T : IComparable
+        {
+            Dictionary<T, Int64> counts = new Dictionary<T, Int64>();
+            foreach (var s in source)
+            {
+                if (counts.ContainsKey(s))
+                {
+                    counts[s] += 1;
+                }
+                else
+                {
+                    counts[s] = 1;
+                }
+            }
+            return counts;
         }
         
         // Enumerate all possible combinations from a list of values
