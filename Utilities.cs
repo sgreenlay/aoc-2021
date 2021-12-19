@@ -80,9 +80,9 @@ namespace Utilities
             return (source >= start) && (source <= end);
         }
 
-        public static Dictionary<char, int> CharCounts(this string str)
+        public static Dictionary<char, Int64> CharCounts(this string str)
         {
-            Dictionary<char, int> counts = new Dictionary<char, int>();
+            Dictionary<char, Int64> counts = new Dictionary<char, Int64>();
             foreach (var ch in str)
             {
                 if (counts.ContainsKey(ch))
